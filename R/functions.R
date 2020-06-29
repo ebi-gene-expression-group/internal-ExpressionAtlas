@@ -188,7 +188,7 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 	atlasExperimentSummary <- lapply( allAnalytics, function( analytics ) {
 		
 		# Get the SDRF rows for this analytics object's assays.
-		analyticsSDRF <- .createAnalyticsSDRF( analytics, atlasSDRF )
+		analyticsSDRF <- createAnalyticsSDRF( analytics, atlasSDRF )
 
 		# Create Bioconductor object, either ExpressionSet, SummarizedExperiment, or MAList.
 		biocObject <- .createBiocObject( 
@@ -555,7 +555,7 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 		expressions <- read.delim( expressionsFile, header=TRUE, stringsAsFactors=FALSE, row.names = 1 )
 		
 		# Create a SummarizedExperiment.
-		biocObject <- .createSummarizedExperiment( expressions, analyticsSDRF, analysisMethodsFile )
+		biocObject <- createSummarizedExperiment( expressions, analyticsSDRF, analysisMethodsFile )
 	}
 	# Otherwise, don't recognise this experiment type so die.
 	else {
@@ -567,12 +567,12 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 }
 
 
-# .createAnalyticsSDRF
+# createAnalyticsSDRF
 # 	- Take an Analytics object and a parsed SDRF.
 # 	- Return a new SDRF data frame with just the assay_names from the Analytics
 # 	object, as well as a column denoting which assay group each assay belongs
 # 	to.
-.createAnalyticsSDRF <- function( analytics, atlasSDRF ) {
+createAnalyticsSDRF <- function( analytics, atlasSDRF ) {
 
 	# Get the assay groups.
 	assayGroups <- assay_groups( analytics )
@@ -654,7 +654,7 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 }
 
 
-.createSummarizedExperiment <- function( expressions, analyticsSDRF, analysisMethodsFile ) {
+createSummarizedExperiment <- function( expressions, analyticsSDRF, analysisMethodsFile ) {
 
     # Make sure all the assays we want are present in the expressions matrix.
     wantedAssays <- rownames( analyticsSDRF )
