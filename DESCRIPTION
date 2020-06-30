@@ -1,7 +1,7 @@
 Package: ExpressionAtlasInternal
 Version: 1.7
 Date: 2018-02-05
-Title: Functions and classes for EMBL-EBI Expression Atlas data
+Title: Functions and Classes for EMBL-EBI Expression Atlas Data
 Author: EMBL-EBI Expression Atlas team
 Maintainer: Suhaib Mohammed <suhaib@ebi.ac.uk>
 Description: Exports functions and classes used in the internal 
