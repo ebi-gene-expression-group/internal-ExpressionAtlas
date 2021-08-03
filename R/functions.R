@@ -127,39 +127,47 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 		stop( paste( "XML config file", atlasExperimentXMLfile, "does not exist or is not readable." ) )
 	}
     
-    cat( paste( "Reading experiment config from", atlasExperimentXMLfile, "...\n" ) )
+  cat( paste( "Reading experiment config from", atlasExperimentXMLfile, "...\n" ) )
 
 	# Parse the XML file.
 	experimentXMLlist <- parseAtlasConfig( atlasExperimentXMLfile )
 
-    cat( "Finished reading experiment config\n" )
+  cat( "Finished reading experiment config\n" )
 
-	# Get the pipeline code from the experiment accession e.g. MTAB, MEXP
-	pipeline <- gsub( "E-", "", experimentAccession )
-	pipeline <- gsub( "-\\d+", "", pipeline )
-
-	# Filename for SDRF.
-	sdrfBasename <- paste( experimentAccession, ".sdrf.txt", sep="" )
+  #read SDRF file from a shell environment variable if it exists (otherwise it returns "")
+  sdrfPath <- Sys.getenv(x = 'SDRF_PATH', unset = "", names = NA)
+    
+  # if SDRF path not found
+  if (sdrfPath == ""){
+      
+    # Get the pipeline code from the experiment accession e.g. MTAB, MEXP
+	  pipeline <- gsub( "E-", "", experimentAccession )
+	  pipeline <- gsub( "-\\d+", "", pipeline )
+	  
+	  # Filename for SDRF.
+	  sdrfBasename <- paste( experimentAccession, ".sdrf.txt", sep="" )
 	
-	# Get ArrayExpress site config to get path to experiment load directories.
-	aeSiteConfig <- createArrayExpressSiteConfig( )
+	  # Get ArrayExpress site config to get path to experiment load directories.
+	  aeSiteConfig <- createArrayExpressSiteConfig( )
 	
 
-	# Complete path to SDRF file.
+	  # Complete path to SDRF file.
     if ( pipeline == "GEOD" ) {
-    	sdrfPath <- file.path( aeSiteConfig$GEO_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
+    	  sdrfPath <- file.path( aeSiteConfig$GEO_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
 
         # If it doesnt exist in GEO_SUBMISSIONS TARGET then retrieve from AE2_LOAD_DIR.
-    	if( !file.exists( sdrfPath ) ) {	
-        	sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
-    	}
+    	  if( !file.exists( sdrfPath ) ) {	
+          sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
+    	  }
     	
-	} else if (pipeline == "ENAD") {
-    	sdrfPath <- file.path( aeSiteConfig$ENA_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
+	  } else if (pipeline == "ENAD") {
+    	  sdrfPath <- file.path( aeSiteConfig$ENA_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
 
     } else {
-		sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
-	}
+		  sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
+    }
+	  
+  }
 
 	# Check SDRF exists, die if not.
 	if( !file.exists( sdrfPath ) ) {
@@ -169,17 +177,17 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 	# Get the experiment type from the parsed XML.
 	atlasExperimentType <- experimentXMLlist$experimentType
     
-    cat( paste( "Reading SDRF from", sdrfPath, "...\n" ) )
+  cat( paste( "Reading SDRF from", sdrfPath, "...\n" ) )
 
 	# Parse the SDRF.
 	atlasSDRF <- parseSDRF( sdrfPath, atlasExperimentType )
 
-    cat( "Finished reading SDRF\n" )
+  cat( "Finished reading SDRF\n" )
 
 	# Get the list of Analytics objects.
 	allAnalytics <- experimentXMLlist$allAnalytics
 
-    cat( "Creating experiment summary...\n" )
+  cat( "Creating experiment summary...\n" )
 
 	# Next step is to go through the analytics objects created from the XML,
 	# pull out the right rows form the SDRF, get the right expressions matrix,
@@ -202,7 +210,7 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 
 	atlasExperimentSummary <- SimpleList( atlasExperimentSummary )
     
-    cat( "Experiment summary created.\n" )
+  cat( "Experiment summary created.\n" )
 
 	return( atlasExperimentSummary )
 
