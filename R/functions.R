@@ -108,6 +108,9 @@ createArrayExpressSiteConfig <- function( ) {
 
 
 # summarizeAtlasExperiment
+#
+#   Block of comments below is not following compliant R documentation format
+#
 # 	- Main function for the package. Takes an experiment accession and a
 # 	directory path where it can find Atlas XML config and expressions matrices.
 # 	- Returns a list of ExpressionSet and/or MAList and/or SummarizedExperiment objects.
