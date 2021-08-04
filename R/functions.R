@@ -141,7 +141,7 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
     sdrfPath <- Sys.getenv( 'SDRF_PATH', unset = NA, names = NA )
     
     # if SDRF path not found
-    if (is.na(sdrfPath) == TRUE){
+    if (is.na(sdrfPath)){
       
         # Get the pipeline code from the experiment accession e.g. MTAB, MEXP
         pipeline <- unlist(strsplit(experimentAccession, '-'))[2] 
