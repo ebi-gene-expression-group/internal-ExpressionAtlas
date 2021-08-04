@@ -16,7 +16,7 @@
 	\item{atlasExperimentDirectory}{
 	Path to the directory containing the Atlas XML config file and expressions
 	matrices. Optionally, a shell environment variable \code{SDRF_PATH} 
-	can be defined containing the path to the SDRF file
+	can be defined containing the path to the SDRF file.
 	}
 }
 \value{
