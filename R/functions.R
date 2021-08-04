@@ -6,7 +6,7 @@
 # 	objects, and the experiment type from the XML.
 parseAtlasConfig <- function( atlasXMLconfigFile ) {
 	
-	# Read the XML file.
+  # Read the XML file.
 	xmlTree <- xmlInternalTreeParse( atlasXMLconfigFile )
 
 	# Get the configuration node -- the root of the tree.
@@ -24,7 +24,7 @@ parseAtlasConfig <- function( atlasXMLconfigFile ) {
 
 	# Create a list of Analytics objects.
 	allAnalytics <- lapply( allAnalyticsNodes, function( analyticsNode ) {
-		analyticsObject <- new( "Analytics", atlasExperimentType, analyticsNode )
+	  analyticsObject <- new( "Analytics", atlasExperimentType, analyticsNode )
 	})
 	
 	names( allAnalytics ) <- sapply( allAnalytics,
@@ -70,12 +70,12 @@ deduceSiteConfigPath <- function( dbName ) {
     # Stick the path back together again.
     atlasInstallPath <- paste( atlasInstallSplitPath, collapse=.Platform$file.sep )
 
-	siteConfigBasename <- paste( dbName, "SiteConfig", ".yml", sep="" )
+	  siteConfigBasename <- paste( dbName, "SiteConfig", ".yml", sep="" )
 	
     # Add the path to the site config file.
     siteConfigFile <- file.path( atlasInstallPath, "atlasprod", "supporting_files", siteConfigBasename )
 
-	return( siteConfigFile )
+	  return( siteConfigFile )
 }
 
 
@@ -86,10 +86,10 @@ createAtlasSiteConfig <- function( ) {
 	# Get the path to the Atlas site config file.
 	atlasSiteConfigFile <- deduceSiteConfigPath( "Atlas" )
 
-    # Read in the site config file.
-    atlasSiteConfig <- yaml.load_file( atlasSiteConfigFile )
+  # Read in the site config file.
+  atlasSiteConfig <- yaml.load_file( atlasSiteConfigFile )
 
-    return( atlasSiteConfig )
+  return( atlasSiteConfig )
 }
 
 
@@ -113,9 +113,9 @@ createArrayExpressSiteConfig <- function( ) {
 # 	- Returns a list of ExpressionSet and/or MAList and/or SummarizedExperiment objects.
 summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirectory ) {
 	
-	# Quit if the accession does not look like an ArrayExpress one.
+  # Quit if the accession does not look like an ArrayExpress one.
 	if( !grepl( "^E-\\w{4}-\\d+$", experimentAccession ) ) {
-		stop( paste( "Accession \"", experimentAccession, "\" does not look like an ArrayExpress accession. Cannot continue", sep="" ) )
+	  stop( paste( "Accession \"", experimentAccession, "\" does not look like an ArrayExpress accession. Cannot continue", sep="" ) )
 	}
 
 	# Atlas XML config file name.
@@ -124,7 +124,7 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 
 	# Die if we can't find the XML config file.
 	if( !file.exists( atlasExperimentXMLfile ) ) {
-		stop( paste( "XML config file", atlasExperimentXMLfile, "does not exist or is not readable." ) )
+	  stop( paste( "XML config file", atlasExperimentXMLfile, "does not exist or is not readable." ) )
 	}
     
   cat( paste( "Reading experiment config from", atlasExperimentXMLfile, "...\n" ) )
@@ -135,14 +135,13 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
   cat( "Finished reading experiment config\n" )
 
   #read SDRF file from a shell environment variable if it exists (otherwise it returns "")
-  sdrfPath <- Sys.getenv(x = 'SDRF_PATH', unset = "", names = NA)
+  sdrfPath <- Sys.getenv( 'SDRF_PATH', unset = NA, names = NA )
     
   # if SDRF path not found
-  if (sdrfPath == ""){
+  if (is.na(sdrfPath) == TRUE){
       
     # Get the pipeline code from the experiment accession e.g. MTAB, MEXP
-	  pipeline <- gsub( "E-", "", experimentAccession )
-	  pipeline <- gsub( "-\\d+", "", pipeline )
+    pipeline <- unlist(strsplit(experimentAccession, '-'))[2] 
 	  
 	  # Filename for SDRF.
 	  sdrfBasename <- paste( experimentAccession, ".sdrf.txt", sep="" )
@@ -153,15 +152,15 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 
 	  # Complete path to SDRF file.
     if ( pipeline == "GEOD" ) {
-    	  sdrfPath <- file.path( aeSiteConfig$GEO_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
+      sdrfPath <- file.path( aeSiteConfig$GEO_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
 
-        # If it doesnt exist in GEO_SUBMISSIONS TARGET then retrieve from AE2_LOAD_DIR.
-    	  if( !file.exists( sdrfPath ) ) {	
-          sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
-    	  }
+      # If it doesnt exist in GEO_SUBMISSIONS TARGET then retrieve from AE2_LOAD_DIR.
+      if( !file.exists( sdrfPath ) ) {	
+        sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
+    	}
     	
 	  } else if (pipeline == "ENAD") {
-    	  sdrfPath <- file.path( aeSiteConfig$ENA_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
+      sdrfPath <- file.path( aeSiteConfig$ENA_SUBMISSIONS_TARGET, pipeline, experimentAccession, sdrfBasename )
 
     } else {
 		  sdrfPath <- file.path( aeSiteConfig$AE2_LOAD_DIR, "EXPERIMENT", pipeline, experimentAccession, sdrfBasename )
@@ -171,7 +170,7 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 
 	# Check SDRF exists, die if not.
 	if( !file.exists( sdrfPath ) ) {
-		stop( paste( "SDRF", sdrfPath, "does not exist or is not readable." ) )
+	  stop( paste( "SDRF", sdrfPath, "does not exist or is not readable." ) )
 	}
 
 	# Get the experiment type from the parsed XML.
@@ -195,11 +194,11 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 	# MAList, or SummarizedExperiment).
 	atlasExperimentSummary <- lapply( allAnalytics, function( analytics ) {
 		
-		# Get the SDRF rows for this analytics object's assays.
-		analyticsSDRF <- createAnalyticsSDRF( analytics, atlasSDRF )
+	# Get the SDRF rows for this analytics object's assays.
+	analyticsSDRF <- createAnalyticsSDRF( analytics, atlasSDRF )
 
-		# Create Bioconductor object, either ExpressionSet, SummarizedExperiment, or MAList.
-		biocObject <- .createBiocObject( 
+	# Create Bioconductor object, either ExpressionSet, SummarizedExperiment, or MAList.
+	biocObject <- .createBiocObject( 
 			analytics, 
 			analyticsSDRF, 
 			atlasExperimentType, 
@@ -219,7 +218,7 @@ summarizeAtlasExperiment <- function( experimentAccession, atlasExperimentDirect
 
 check_file_exists <- function( filename ) {
 
-	if( !file.exists( filename ) ) {
+  if( !file.exists( filename ) ) {
 		stop( paste( 
 			"Cannot find:",
 			filename
@@ -249,7 +248,7 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 	# that we can use grep.
 	completeSDRF <- read.delim( filename, header = FALSE, stringsAsFactors = FALSE )
     
-    cat( "Getting characteristic and factor column indices\n" )
+  cat( "Getting characteristic and factor column indices\n" )
 
 	# Get the Characteristics column indices, and any unit columns next to them.
 	charColIndices <- grep( "^Characteristics", ignore.case = FALSE, completeSDRF[ 1, ] )
@@ -259,39 +258,39 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 	factorColIndices <- grep( "^Factor\\s?Value", ignore.case = FALSE, completeSDRF[ 1, ] )
 	factorColIndices <- .addUnitCols( factorColIndices, completeSDRF )
 
-    cat( "Checking for technical replicates\n" )
+  cat( "Checking for technical replicates\n" )
 
 	# Get the index of the Comment[technical replicate group] column, if there
 	# is one.
 	techRepGroupColIndex <- grep( "Comment\\s?\\[\\s?technical[ _]replicate[ _]group\\s?\\]", ignore.case = TRUE, completeSDRF[ 1, ] )
 	
-    cat( "Locating assay names...\n" )
+  cat( "Locating assay names...\n" )
 
 	# Get the column index for assay names. For microarray data, this is "Assay
 	# Name" or "Hybridization Name". For RNA-seq data, this is "Comment[ENA_RUN]"
 	if( grepl( "rnaseq", atlasExperimentType ) ) {
 		
-		assayNameColIndex <- grep( "Comment\\s?\\[\\s?ENA_RUN\\s?\\]", ignore.case = TRUE, completeSDRF[ 1, ] )
+	  assayNameColIndex <- grep( "Comment\\s?\\[\\s?ENA_RUN\\s?\\]", ignore.case = TRUE, completeSDRF[ 1, ] )
 
 		if( length( assayNameColIndex ) != 1 ) {
-            assayNameColIndex <- grep( "Comment\\s?\\[\\s?RUN_NAME\\s?\\]", ignore.case = TRUE, completeSDRF[ 1, ] )
-        }
+      assayNameColIndex <- grep( "Comment\\s?\\[\\s?RUN_NAME\\s?\\]", ignore.case = TRUE, completeSDRF[ 1, ] )
+    }
 
 		if( length( assayNameColIndex ) != 1 ) {
-            assayNameColIndex <- grep( "Scan\\s?Name", ignore.case = TRUE, completeSDRF[ 1, ] )
-        }
+      assayNameColIndex <- grep( "Scan\\s?Name", ignore.case = TRUE, completeSDRF[ 1, ] )
+    }
 		
-        if( length( assayNameColIndex ) != 1 ) {
-			stop( "Did not find Comment[ ENA_RUN ] or Comment[ RUN_NAME ] or Scan Name column in SDRF." )
-		}
-	}
+    if( length( assayNameColIndex ) != 1 ) {
+		  stop( "Did not find Comment[ ENA_RUN ] or Comment[ RUN_NAME ] or Scan Name column in SDRF." )
+	  }
+  }
 	else {
 		
-		assayNameColIndex <- grep( "Assay\\s?Name", ignore.case = TRUE, completeSDRF[ 1, ] )
+	  assayNameColIndex <- grep( "Assay\\s?Name", ignore.case = TRUE, completeSDRF[ 1, ] )
 
 		if( length( assayNameColIndex ) != 1 ) {
 
-			assayNameColIndex <- grep( "Hybridi[sz]ation\\s?Name", ignore.case = TRUE, completeSDRF[ 1, ] )
+		  assayNameColIndex <- grep( "Hybridi[sz]ation\\s?Name", ignore.case = TRUE, completeSDRF[ 1, ] )
 
 			# Check that we got something.
 			if( length( assayNameColIndex ) != 1 ) {
@@ -301,36 +300,35 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 
 		# For two-colour array data, also want to get the label column.
 		if( grepl( "2colour", atlasExperimentType ) ) {
-
-			labelColIndex <- which( completeSDRF[ 1, ] == "Label" )
+		  labelColIndex <- which( completeSDRF[ 1, ] == "Label" )
 		}
 	}
 	
-    cat( "Found assay names. Subsetting SDRF...\n" )
+  cat( "Found assay names. Subsetting SDRF...\n" )
 
 	# Now we should have everything we need to get the right columns and make a
 	# more friendly SDRF.
 	if( grepl( "2colour", atlasExperimentType ) ) {
 
-		subsetSDRF <- completeSDRF[ , c( assayNameColIndex, labelColIndex, charColIndices, factorColIndices ) ]
+	  subsetSDRF <- completeSDRF[ , c( assayNameColIndex, labelColIndex, charColIndices, factorColIndices ) ]
 	}
 	else {
 		
-		subsetSDRF <- completeSDRF[ , c( assayNameColIndex, charColIndices, factorColIndices ) ]
+	  subsetSDRF <- completeSDRF[ , c( assayNameColIndex, charColIndices, factorColIndices ) ]
 	}
 
-    cat( "Finished subsetting SDRF.\n" )
+  cat( "Finished subsetting SDRF.\n" )
 
 	# If we got a technical replicate group column, add this at the end of the
 	# subsetSDRF.
 	if( length( techRepGroupColIndex ) > 0 ) {
-		subsetSDRF <- cbind( subsetSDRF, completeSDRF[ , techRepGroupColIndex ] )
+	  subsetSDRF <- cbind( subsetSDRF, completeSDRF[ , techRepGroupColIndex ] )
 	}
 
-    # Next, merge the contents of unit columns with the column before.
-    subsetSDRF <- .mergeUnits( subsetSDRF )
+  # Next, merge the contents of unit columns with the column before.
+  subsetSDRF <- .mergeUnits( subsetSDRF )
     
-    cat( "Fixing column headings...\n" )
+  cat( "Fixing column headings...\n" )
 
 	# Next thing is to name the columns so they have nice names.
 	newColNames <- gsub( "Characteristics\\s?\\[", "", subsetSDRF[1,] )
@@ -341,15 +339,15 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 	# Replace the last column name with one for the technical replicate group
 	# column, if there is one.
 	if( length( techRepGroupColIndex ) > 0 ) {
-		newColNames[ length( newColNames ) ] <- "technical_replicate_group"
+	  newColNames[ length( newColNames ) ] <- "technical_replicate_group"
 	}
 	
 	# Replace spaces with underscores.
 	newColNames <- gsub( " ", "_", newColNames )
     
-    cat( "Finished fixing column headings.\n" )
+  cat( "Finished fixing column headings.\n" )
 
-    cat( "Removing duplicated columns...\n" )
+  cat( "Removing duplicated columns...\n" )
 
 	# Now we've got the new names for the columns, check if any are the same
 	# (use "tolower" function to convert all to lower case).
@@ -358,31 +356,31 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 	# Remove the duplicated columns from the new column names and the subset
 	# SDRF.
 	if( length( duplicateColIndices ) > 0 ) {
-		subsetSDRF <- subsetSDRF[ , -duplicateColIndices ]
+	  subsetSDRF <- subsetSDRF[ , -duplicateColIndices ]
 		newColNames <- newColNames[ -duplicateColIndices ]
 	}
 
-    cat( "Finished removing duplicated columns.\n" )
+  cat( "Finished removing duplicated columns.\n" )
 
 	# Remove the first row of the SDRF (this is the old column headings)
 	subsetSDRF <- subsetSDRF[ -1, ]
 	
-    cat( "Applying new column headings...\n" )
+  cat( "Applying new column headings...\n" )
 
 	# Add the new column names as the column headings.
 	colnames( subsetSDRF ) <- newColNames
 
-    cat( "Finished applying new column headings.\n" )
+  cat( "Finished applying new column headings.\n" )
 	
-    cat( "Removing duplicated rows...\n" )
+  cat( "Removing duplicated rows...\n" )
 
 	# Remove duplicated rows, which occur e.g. if an assay has more than one file.
 	duplicateRowIndices <- which( duplicated( subsetSDRF ) )
 	if( length( duplicateRowIndices ) > 0 ) {
-		subsetSDRF <- subsetSDRF[ -duplicateRowIndices, ]
+	  subsetSDRF <- subsetSDRF[ -duplicateRowIndices, ]
 	}
 
-    cat( "Finished removing duplicated rows.\n" )
+  cat( "Finished removing duplicated rows.\n" )
 
 	# Make assay names "R-safe".
 	subsetSDRF$AssayName <- make.names( subsetSDRF$AssayName )
@@ -398,11 +396,11 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 # 	Unit[] columns that are next to them.
 .addUnitCols <- function( colIndices, SDRF ) {
     
-	# Get the indices of unit columns. 
+  # Get the indices of unit columns. 
 	unitCols <- unlist(
 		
-		# Go through each column index provided.
-		sapply(
+	  # Go through each column index provided.
+	  sapply(
 			colIndices,
 			function( colNumber ) {
 				
@@ -412,13 +410,12 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 				# Only try if this is not the very last column.
 				if( nextCol <= ncol( SDRF ) ) {
 
-					# If it's a unit column, return the index.
-					if( grepl( "Unit", SDRF[ 1, nextCol ] ) ) {
+				# If it's a unit column, return the index.
+				  if( grepl( "Unit", SDRF[ 1, nextCol ] ) ) {
 						nextCol
 					}
 				}
-			}
-		)
+			})
 	)
 	
 
@@ -440,15 +437,15 @@ parseSDRF <- function( filename, atlasExperimentType ) {
 
 .mergeUnits <- function( subsetSDRF ) {
 
-    # Find the unit columns.
-    unitCols <- grep( "Unit", subsetSDRF[ 1, ] )
+  # Find the unit columns.
+  unitCols <- grep( "Unit", subsetSDRF[ 1, ] )
     
-    if( length( unitCols ) > 0 ) {
+  if( length( unitCols ) > 0 ) {
         
-        cat( "Merging unit columns...\n" )
+    cat( "Merging unit columns...\n" )
     
-        # Create some new merged columns.
-        mergedCols <- data.frame( 
+    # Create some new merged columns.
+    mergedCols <- data.frame( 
             sapply( 
                 unitCols,
                 function( unitCol ) {
@@ -456,29 +453,29 @@ parseSDRF <- function( filename, atlasExperimentType ) {
                 }
             ),
             stringsAsFactors = FALSE
-        )
+      )
 
-        # Get the indices of the columns for which these unit columns apply.
-        valueCols <- unitCols - 1
+      # Get the indices of the columns for which these unit columns apply.
+      valueCols <- unitCols - 1
         
-        # Replace the first row (header) with the one from the original SDRF.
-        mergedCols[ 1 , ] <- subsetSDRF[ 1, valueCols ]
+      # Replace the first row (header) with the one from the original SDRF.
+      mergedCols[ 1 , ] <- subsetSDRF[ 1, valueCols ]
         
-        # Replace the original value columns with the new merged columns.
-        subsetSDRF[ , valueCols ] <- mergedCols
+      # Replace the original value columns with the new merged columns.
+      subsetSDRF[ , valueCols ] <- mergedCols
 
-        # Delete the Unit columns.
-        subsetSDRF <- subsetSDRF[ , -unitCols ]
+      # Delete the Unit columns.
+      subsetSDRF <- subsetSDRF[ , -unitCols ]
 
-        cat( "Finished merging unit columns.\n" )
+      cat( "Finished merging unit columns.\n" )
     
-        return( subsetSDRF )
+      return( subsetSDRF )
 
     } else {
 
-        # If there aren't any Unit columns, just return without doing anything.
-        cat( "No Unit columns found.\n" )
-        return( subsetSDRF )
+    # If there aren't any Unit columns, just return without doing anything.
+    cat( "No Unit columns found.\n" )
+    return( subsetSDRF )
     }
 }
 
@@ -664,24 +661,24 @@ createAnalyticsSDRF <- function( analytics, atlasSDRF ) {
 
 createSummarizedExperiment <- function( expressions, analyticsSDRF, analysisMethodsFile ) {
 
-    # Make sure all the assays we want are present in the expressions matrix.
-    wantedAssays <- rownames( analyticsSDRF )
-    matrixAssays <- colnames( expressions )
+  # Make sure all the assays we want are present in the expressions matrix.
+  wantedAssays <- rownames( analyticsSDRF )
+  matrixAssays <- colnames( expressions )
 
-    # Die if any assays we wanted are missing.
-    if( !all( wantedAssays %in% matrixAssays ) ) {
+  # Die if any assays we wanted are missing.
+  if( !all( wantedAssays %in% matrixAssays ) ) {
 
-        missingAssays <- wantedAssays[ which( !wantedAssays %in% matrixAssays ) ]
+     missingAssays <- wantedAssays[ which( !wantedAssays %in% matrixAssays ) ]
 
-        missingAssayString <- paste( missingAssays, collapse = "\n" )
+    missingAssayString <- paste( missingAssays, collapse = "\n" )
 
-        stop( paste( 
-            "The following assays are missing from the expression matrix:",
-            missingAssayString,
-            "Cannot continue.",
-            sep = "\n"
-        ) )
-    }
+    stop( paste( 
+          "The following assays are missing from the expression matrix:",
+          missingAssayString,
+          "Cannot continue.",
+          sep = "\n"
+    ) )
+  }
 	
 	# Only select columns with assay names in our SDRF.
 	expressions <- expressions[ , rownames( analyticsSDRF ) ]
@@ -695,9 +692,9 @@ createSummarizedExperiment <- function( expressions, analyticsSDRF, analysisMeth
 	# Get analysis methods
 	analysisMethodsList <- .readSeqAnalysisMethods( analysisMethodsFile )
     
-    # Create dummy row ranges (copied from SummarizedExperiment class code)
-    partitioning <- PartitioningByEnd( integer( nrow( expressionsMatrix ) ), names = rownames( expressionsMatrix ) )
-    dummyRanges <- BiocGenerics::relist( GRanges(), partitioning )
+  # Create dummy row ranges (copied from SummarizedExperiment class code)
+  partitioning <- PartitioningByEnd( integer( nrow( expressionsMatrix ) ), names = rownames( expressionsMatrix ) )
+  dummyRanges <- BiocGenerics::relist( GRanges(), partitioning )
 
 	# Create SummarizedExperiment
 	summarizedExperiment <- SummarizedExperiment( 
