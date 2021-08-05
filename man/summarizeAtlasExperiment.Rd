@@ -4,7 +4,7 @@
 \description{
 	Create a \code{SimpleList} object containing \code{ExpressionSet},
 	\code{SummarizedExperiment}, and/or \code{MAList} objects storing data from
-	an Expression Atlas experiment.
+	an Expression Atlas experiment. 
 }
 \usage{
 	summarizeAtlasExperiment( experimentAccession, atlasExperimentDirectory )
@@ -15,7 +15,8 @@
 	}
 	\item{atlasExperimentDirectory}{
 	Path to the directory containing the Atlas XML config file and expressions
-	matrices
+	matrices. Optionally, a shell environment variable \code{SDRF_PATH} 
+	can be defined containing the path to the SDRF file.
 	}
 }
 \value{
