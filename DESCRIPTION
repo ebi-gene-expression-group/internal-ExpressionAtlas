@@ -6,7 +6,7 @@ Author: EMBL-EBI Expression Atlas team
 Maintainer: Anil Thanki <anil.thanki@ebi.ac.uk>
 Description: Exports functions and classes used in the internal 
   representation and analysis of EMBL-EBI Expression Atlas data.
-Depends: R (>= 4.6.0)
+Depends: R (>= 4.5.0)
 Imports: XML, yaml, plyr, Biobase, BiocGenerics, SummarizedExperiment, GenomicRanges, IRanges, limma, S4Vectors, methods
 Collate: BiologicalReplicate.R AssayGroup.R Contrast.R BatchEffect.R Analytics.R functions.R
 License: GPL (>= 3)
